@@ -15,11 +15,32 @@ c = conn.cursor()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secretkey"
 
+BASE_URL = "http://0.0.0.0:1234/url/"
 
-@app.route("/")
-@login_required
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    if request.method == "POST":
+
+        if not request.form.get("url"):
+            "please fill out all required fields"
+
+        auto_code = random_str()
+
+        codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
+
+        while len(codes) != 0:
+            auto_code = random_str()
+
+            codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
+
+        c.execute("INSERT INTO urls (original_url, auto_code, code) VALUES (:o_url, :code, :code)", {"o_url": request.form.get("url"), "code": auto_code})
+
+        conn.commit()
+
+        return render_template("success.html", BASE_URL=BASE_URL, auto_code=auto_code)
+
+    else:
+        return render_template("index.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -85,3 +106,17 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+@app.route("/url/<string:code>")
+def url(code):
+
+    result = c.execute("SELECT original_url FROM urls WHERE code=:code", {"code": code}).fetchall()
+
+    if len(result) != 1:
+        return "404"
+
+    return redirect(result[0][0])
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=1234, debug=True)

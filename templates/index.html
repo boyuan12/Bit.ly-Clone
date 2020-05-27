@@ -5,5 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Welcome! User {{ session["user_id"] }}</h1>
+    <form action="/" method="POST">
+        <div class="form-group">
+            <label for="exampleInputEmail1">URL</label>
+            <input type="url" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="url">
+            <small id="emailHelp" class="form-text text-muted">Put the URL that you want to shorten here</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 {% endblock %}
