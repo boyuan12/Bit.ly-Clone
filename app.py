@@ -37,6 +37,9 @@ def index():
 
         conn.commit()
 
+        # is user logged in
+        if session.get("user_id"):
+            return render_template("confirm.html", BASE_URL=BASE_URL, code=auto_code, original_url=request.form.get("url"))
         return render_template("success.html", BASE_URL=BASE_URL, auto_code=auto_code)
 
     else:
@@ -116,6 +119,26 @@ def url(code):
         return "404"
 
     return redirect(result[0][0])
+
+
+@app.route("/update", methods=["POST"])
+def update():
+
+    if not request.form.get("new"):
+        return "please fill out ALL required fields"
+
+    if not request.form.get("new").isalnum():
+        return "You must provide ONLY alpha numeric value"
+
+    codes = c.execute("SELECT * FROM urls WHERE auto_code != :new AND code=:new", {"new": request.form.get("new")}).fetchall()
+
+    if len(codes) != 0:
+        return "code already exists"
+
+    c.execute("UPDATE urls SET code=:new WHERE auto_code=:code", {"new": request.form.get("new"), "code": request.form.get("code")})
+    conn.commit()
+
+    return render_template("success.html", BASE_URL=BASE_URL, auto_code=request.form.get("new"))
 
 
 if __name__ == "__main__":
