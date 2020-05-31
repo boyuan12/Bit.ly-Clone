@@ -8,4 +8,17 @@
     <div class="alert alert-success" role="alert">
         Great! Now you can visit at {{ BASE_URL }}{{ auto_code }}
     </div>
+    {% if not session["user_id"] %}
+        <script>
+            var oldUrl = "{{ old }}";
+            var newUrl = "{{ BASE_URL }}{{ auto_code }}"
+            if (localStorage.getItem("urls") == null) {
+                localStorage.setItem("urls", `${newUrl}-${oldUrl},`);
+            } else {
+                localStorage.setItem("urls", localStorage.getItem("urls") + `${newUrl}-${oldUrl},`);
+            }
+            console.log(localStorage.getItem("urls"))
+        </script>
+    {% endif %}
+
 {% endblock %}

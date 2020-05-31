@@ -36,11 +36,11 @@ def index():
         c.execute("INSERT INTO urls (original_url, auto_code, code) VALUES (:o_url, :code, :code)", {"o_url": request.form.get("url"), "code": auto_code})
 
         conn.commit()
-
+        print(session.get("user_id") == None)
         # is user logged in
         if session.get("user_id"):
             return render_template("confirm.html", BASE_URL=BASE_URL, code=auto_code, original_url=request.form.get("url"))
-        return render_template("success.html", BASE_URL=BASE_URL, auto_code=auto_code)
+        return render_template("success.html", BASE_URL=BASE_URL, auto_code=auto_code, old=request.form.get("url"))
 
     else:
         return render_template("index.html")
