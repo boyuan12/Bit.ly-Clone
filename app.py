@@ -1,10 +1,6 @@
 from flask import Flask, session, redirect, url_for, render_template, request, url_for
 import sqlite3
 
-"""
-pip uninstall Werkzeug
-pip install Werkzeug==0.16.0
-"""
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import *
@@ -33,10 +29,25 @@ def index():
 
             codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
 
-        c.execute("INSERT INTO urls (original_url, auto_code, code) VALUES (:o_url, :code, :code)", {"o_url": request.form.get("url"), "code": auto_code})
+        import time
+        from datetime import date
+
+        # get today's date
+        today = date.today()
+
+        # mm/dd/yyyy
+        date = today.strftime("%m/%d/%y")
+
+        # pure timestamp
+        ts = time.gmtime()
+
+        # readable timestamp
+        timestamp = time.strftime("%x %X", ts)
+
+        c.execute("INSERT INTO urls (original_url, auto_code, code, date, timestamp, user_id) VALUES (:o_url, :code, :code, :date, :time, :u_id)", {"o_url": request.form.get("url"), "code": auto_code, "date": date, "time": timestamp, "u_id": session.get("user_id")})
 
         conn.commit()
-        print(session.get("user_id") == None)
+
         # is user logged in
         if session.get("user_id"):
             return render_template("confirm.html", BASE_URL=BASE_URL, code=auto_code, original_url=request.form.get("url"))
@@ -99,7 +110,7 @@ def login():
         session["user_id"] = user[0][0]
 
         # return success
-        return "successfully logged-in!"
+        return redirect("/dashboard")
 
     else:
         return render_template("login.html")
@@ -122,6 +133,7 @@ def url(code):
 
 
 @app.route("/update", methods=["POST"])
+@login_required
 def update():
 
     if not request.form.get("new"):
@@ -138,8 +150,14 @@ def update():
     c.execute("UPDATE urls SET code=:new WHERE auto_code=:code", {"new": request.form.get("new"), "code": request.form.get("code")})
     conn.commit()
 
-    return render_template("success.html", BASE_URL=BASE_URL, auto_code=request.form.get("new"))
+    return redirect("/dashboard")
 
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    urls = c.execute("SELECT * FROM urls WHERE user_id=:u_id", {"u_id": session.get("user_id")}).fetchall()
+    print(urls)
+    return render_template("dashboard.html", BASE_URL=BASE_URL, urls=urls)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=1234, debug=True)

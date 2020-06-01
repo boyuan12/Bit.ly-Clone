@@ -1,0 +1,26 @@
+.col-4 {
+    height: 100vh;
+    border: 1px solid black;
+    overflow-y:auto;
+  }
+  
+  .url {
+    padding: 10px;
+  }
+  
+  .clicks {
+    position: absolute;
+    left: 50vh;
+  }
+  
+  #copy {
+    position: absolute;
+    left: 60vh;
+    padding: 5px;
+  }
+  
+  #edit {
+    position: absolute;
+    left: 70vh;
+    padding: 5px;
+  }
