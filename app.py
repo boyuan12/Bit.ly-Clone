@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, render_template, request, url_for
+from flask import Flask, session, redirect, url_for, render_template, request, jsonify
 import sqlite3
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -44,7 +44,7 @@ def index():
         # readable timestamp
         timestamp = time.strftime("%x %X", ts)
 
-        c.execute("INSERT INTO urls (original_url, auto_code, code, date, timestamp, user_id) VALUES (:o_url, :code, :code, :date, :time, :u_id)", {"o_url": request.form.get("url"), "code": auto_code, "date": date, "time": timestamp, "u_id": session.get("user_id")})
+        c.execute("INSERT INTO urls (original_url, auto_code, code, date, timestamp, user_id, click) VALUES (:o_url, :code, :code, :date, :time, :u_id, 0)", {"o_url": request.form.get("url"), "code": auto_code, "date": date, "time": timestamp, "u_id": session.get("user_id")})
 
         conn.commit()
 
@@ -124,12 +124,15 @@ def logout():
 @app.route("/url/<string:code>")
 def url(code):
 
-    result = c.execute("SELECT original_url FROM urls WHERE code=:code", {"code": code}).fetchall()
+    result = c.execute("SELECT * FROM urls WHERE code=:code", {"code": code}).fetchall()
 
     if len(result) != 1:
         return "404"
 
-    return redirect(result[0][0])
+    c.execute("UPDATE urls SET click = :c WHERE url_id=:id", {"c": int(result[0][7]) + 1, "id": result[0][0]})
+    conn.commit()
+
+    return redirect(result[0][1])
 
 
 @app.route("/update", methods=["GET", "POST"])
@@ -170,8 +173,56 @@ def update():
 @login_required
 def dashboard():
     urls = c.execute("SELECT * FROM urls WHERE user_id=:u_id", {"u_id": session.get("user_id")}).fetchall()
-    print(urls)
     return render_template("dashboard.html", BASE_URL=BASE_URL, urls=urls)
+
+
+@app.route("/api", methods=["GET"])
+def api():
+    # Check is custom code available
+    if request.args.get("custom") and not request.args.get("url"):
+
+        url = c.execute("SELECT * FROM urls WHERE auto_code = :custom OR code = :custom", {"custom": request.args.get("custom")}).fetchall()
+
+        if len(url) == 0:
+            return jsonify(code=200, description="Your custom code is available as of now")
+        return jsonify(code=400, error="Your custom code already exist")
+
+    if not request.args.get("url"):
+            return jsonify(code=400, error="Please fill out url parameter")
+
+    if not validate_url(request.args.get("url")):
+        return jsonify(code=400, error="Your URL is not valid")
+
+    if not request.args.get("custom"):
+
+        auto_code = random_str()
+
+        codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
+
+        while len(codes) != 0:
+            auto_code = random_str()
+
+            codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
+
+        c.execute("INSERT INTO urls (original_url, auto_code, code, click) VALUES (:o_url, :code, :code, 0)", {"o_url": request.args.get("url"), "code": auto_code})
+
+        conn.commit()
+
+        return jsonify(code=200, url=f"{BASE_URL}{auto_code}")
+
+    if request.args.get("custom"):
+
+        url = c.execute("SELECT * FROM urls WHERE auto_code = :custom OR code = :custom", {"custom": request.args.get("custom")}).fetchall()
+
+        if len(url) != 0:
+            return jsonify(code=400, error="code already exists")
+
+        c.execute("INSERT INTO urls (original_url, auto_code, code, click) VALUES (:o_url, :code, :code, 0)", {"o_url": request.args.get("url"), "code": request.args.get("custom")})
+
+        conn.commit()
+
+        return jsonify(code=200, url=f"{BASE_URL}{request.args.get('custom')}")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=1234, debug=True)

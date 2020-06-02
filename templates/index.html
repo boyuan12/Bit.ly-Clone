@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block main %}
+<div class="jumbotron">
+    <h1 class="display-4">Flask Project | Bit.ly Clone | A URL Shortener</h1>
+  </div>
     <form action="/" method="POST">
         <div class="form-group">
             <label for="exampleInputEmail1">URL</label>
@@ -14,9 +17,9 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <br>
-    <h2>URLs Created</h2>
-    <ul id="urls"></ul>
     {% if not session["user_id"] %}
+        <h2>URLs Created</h2>
+        <ul id="urls"></ul>
         <script>
             var urls = localStorage.getItem("urls");
             if (urls != null) {
@@ -25,8 +28,15 @@
                     var oldUrl = urls[i].split("-")[0];
                     var newUrl = urls[i].split("-")[1];
 
+                    var a = document.createElement('a');
+                    var linkText = document.createTextNode(oldUrl);
+                    a.appendChild(linkText);
+                    a.title = oldUrl;
+                    a.href = oldUrl;
+                    document.getElementById("urls").appendChild(a);
+
                     var node = document.createElement("LI");
-                    var textnode = document.createTextNode(`${oldUrl} - ${newUrl}`);
+                    var textnode = document.createTextNode(`${newUrl}`);
                     node.appendChild(textnode);
                     document.getElementById("urls").appendChild(node);
                 }

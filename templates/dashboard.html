@@ -8,7 +8,36 @@
         <link rel="stylesheet" href="/static/styles.css">
     </head>
     <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/">Flask - Bit.ly Clone</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
 
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">Shorten Your URL <span class="sr-only">(current)</span></a>
+                </li>
+                {% if session["user_id"] %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                {% endif %}
+                {% if session["user_id"] %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                {% endif %}
+              </ul>
+              {% if not session["user_id"] %}
+                <span class="navbar-text">
+                    <a href="/register">Register</a>
+                    <a href="/login">Login</a>
+                </span>
+              {% endif %}
+            </div>
+        </nav>
         <script>
             function displayInfo(originalUrl, newUrl, timestamp, click, id) {
                 document.getElementById("original_url").textContent = originalUrl;
@@ -36,7 +65,7 @@
                 <small>{{ url[4] }}</small>
                 <p>{{ url[1] }}</p>
                 <a href="{{ BASE_URL }}{{ url[3] }}" style="font-size: 10px;" class="new">{{ BASE_URL }}{{ url[3] }}</a>
-                <span class="clicks"><small>{{ url[6] }}</small> click(s) <i class="fas fa-mouse-pointer"></i></span>
+                <span class="clicks"><small>{{ url[7] }}</small> click(s) <i class="fas fa-mouse-pointer"></i></span>
                 <hr>
                 </div>
             {% endfor %}
@@ -51,7 +80,7 @@
             <button type="button" id="copy" class="btn btn-info" onclick="copyToClipboard('#new_url')">Copy</button>
             <button type="button" id="edit" class="btn btn-info" onclick="window.location.replace(`/update?id=${document.getElementById('id').textContent}`);">Edit</button>
             <hr>
-                <span><span id="click_count">{{ urls[0][6] }}</span> click(s) <i class="fas fa-mouse-pointer"></i></span>
+                <span><span id="click_count">{{ urls[0][7] }}</span> click(s) <i class="fas fa-mouse-pointer"></i></span>
             </div>
         </div>
         {% endif %}
