@@ -132,25 +132,39 @@ def url(code):
     return redirect(result[0][0])
 
 
-@app.route("/update", methods=["POST"])
+@app.route("/update", methods=["GET", "POST"])
 @login_required
 def update():
 
-    if not request.form.get("new"):
-        return "please fill out ALL required fields"
+    if request.method  == "POST":
 
-    if not request.form.get("new").isalnum():
-        return "You must provide ONLY alpha numeric value"
+        if not request.form.get("new"):
+            return "please fill out ALL required fields"
 
-    codes = c.execute("SELECT * FROM urls WHERE auto_code != :new AND code=:new", {"new": request.form.get("new")}).fetchall()
+        if not request.form.get("new").isalnum():
+            return "You must provide ONLY alpha numeric value"
 
-    if len(codes) != 0:
-        return "code already exists"
+        codes = c.execute("SELECT * FROM urls WHERE auto_code != :new AND code=:new", {"new": request.form.get("new")}).fetchall()
 
-    c.execute("UPDATE urls SET code=:new WHERE auto_code=:code", {"new": request.form.get("new"), "code": request.form.get("code")})
-    conn.commit()
+        if len(codes) != 0:
+            return "code already exists"
 
-    return redirect("/dashboard")
+        c.execute("UPDATE urls SET code=:new WHERE auto_code=:code OR code=:code", {"new": request.form.get("new"), "code": request.form.get("code")})
+        conn.commit()
+
+        return redirect("/dashboard")
+
+    else:
+        if not request.args.get("id"):
+            return "please fill out all required fields"
+
+        url = c.execute("SELECT * FROM urls WHERE url_id=:id", {"id": request.args.get("id")}).fetchall()
+
+        if session.get("user_id") != url[0][6]:
+            return "403"
+
+        return render_template("confirm.html", BASE_URL=BASE_URL, code=url[0][3], original_url=url[0][1])
+
 
 @app.route("/dashboard")
 @login_required
