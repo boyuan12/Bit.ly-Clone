@@ -9,19 +9,19 @@ This is a REST API and all response will return in JSON. If an error occured, th
 500 - Internal Server Error
 502 - Under Mainteance
 
-## /api?custom=
+## GET /api?custom=
 
 **Check whether a given custom code already exist in our database or not**
 
 Return **200**, otherwise will return 400.
 
-## /api?url=
+## GET /api?url=
 
 **Create a new shortened URL by generating random 7 digits alphanumeric characters**
 
 Return **200** with url key, otherwise will return 400 if the URL is not valid
 
-## /api?url=&custom
+## GET /api?url=&custom=
 
 **Create a new shortened URL by user's given code**
 
