@@ -1,54 +1,62 @@
+import os
+
 from flask import Flask, session, redirect, url_for, render_template, request, jsonify
 import sqlite3
-
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from helpers import *
 
-conn = sqlite3.connect("db.sqlite3", check_same_thread=False)
-c = conn.cursor()
+if not os.getenv('DATABASE_URL'):
+    conn = sqlite3.connect("db.sqlite3", check_same_thread=False)
+    c = conn.cursor()
+else:
+    engine = create_engine(os.getenv("DATABASE_URL"))
+    db = scoped_session(sessionmaker(bind=engine))
+    conn = db()
+    c = conn
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secretkey"
 
-BASE_URL = "http://0.0.0.0:1234/url/"
+BASE_URL = "http://bitly-clone-flask.herokuapp.com/url/"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
 
+        # check whether all fields filled
         if not request.form.get("url"):
             "please fill out all required fields"
 
+        # generate a code using one of the helper function
         auto_code = random_str()
 
+        # check whether the code created is valid
         codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
-
         while len(codes) != 0:
             auto_code = random_str()
-
             codes = c.execute("SELECT * FROM urls WHERE auto_code=:auto_code OR code=:auto_code", {"auto_code" : auto_code}).fetchall()
 
+        # get the date and timestamp
         import time
         from datetime import date
-
         # get today's date
         today = date.today()
-
         # mm/dd/yyyy
         date = today.strftime("%m/%d/%y")
-
         # pure timestamp
         ts = time.gmtime()
-
         # readable timestamp
         timestamp = time.strftime("%x %X", ts)
 
+        # INSERT into urls with all the information and commit to the database
         c.execute("INSERT INTO urls (original_url, auto_code, code, date, timestamp, user_id, click) VALUES (:o_url, :code, :code, :date, :time, :u_id, 0)", {"o_url": request.form.get("url"), "code": auto_code, "date": date, "time": timestamp, "u_id": session.get("user_id")})
-
         conn.commit()
 
-        # is user logged in
+        # render different template based on wheter user logged in or not
         if session.get("user_id"):
             return render_template("confirm.html", BASE_URL=BASE_URL, code=auto_code, original_url=request.form.get("url"))
         return render_template("success.html", BASE_URL=BASE_URL, auto_code=auto_code, old=request.form.get("url"))

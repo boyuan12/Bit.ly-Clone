@@ -77,7 +77,7 @@
             <br><br><br>
             <small><span id="new_url">{{ BASE_URL }}{{ urls[0][3] }}</span></small>
             <small style="color: white" id="id">{{ urls[0][0] }}</small>
-            <button type="button" id="copy" class="btn btn-info" onclick="copyToClipboard('#new_url')">Copy</button>
+            <button type="button" id="copy" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="right" data-content="Copied" onclick="copyToClipboard('#new_url')">Copy</button>
             <button type="button" id="edit" class="btn btn-info" onclick="window.location.replace(`/update?id=${document.getElementById('id').textContent}`);">Edit</button>
             <hr>
                 <span><span id="click_count">{{ urls[0][7] }}</span> click(s) <i class="fas fa-mouse-pointer"></i></span>
@@ -86,13 +86,9 @@
         {% endif %}
 
         <script>
-            /*var name = $('a').text();
-            if (name.length > 45) {
-                var shortname = name.substring(0, 45) + " ...";
-                console.log(shortname);
-                console.log(name);
-                $('a').replaceWith(`<a href=${name}>${shortname}</a>`);
-            }*/
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
         </script>
     </body>
 </html>
