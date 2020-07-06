@@ -25,8 +25,8 @@
             if (urls != null) {
                 urls = urls.split(",")
                 for (let i = 0; i < urls.length - 1; i++) {
-                    var oldUrl = urls[i].split("-")[0];
-                    var newUrl = urls[i].split("-")[1];
+                    var oldUrl = urls[i].split(",")[0];
+                    var newUrl = urls[i].split(",")[1];
 
                     var a = document.createElement('a');
                     var linkText = document.createTextNode(oldUrl);

@@ -13,9 +13,9 @@
             var oldUrl = "{{ old }}";
             var newUrl = "{{ BASE_URL }}{{ auto_code }}"
             if (localStorage.getItem("urls") == null) {
-                localStorage.setItem("urls", `${newUrl}-${oldUrl},`);
+                localStorage.setItem("urls", `${newUrl},${oldUrl}`);
             } else {
-                localStorage.setItem("urls", localStorage.getItem("urls") + `${newUrl}-${oldUrl},`);
+                localStorage.setItem("urls", localStorage.getItem("urls") + `${newUrl},${oldUrl},`);
             }
             console.log(localStorage.getItem("urls"))
         </script>
