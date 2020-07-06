@@ -12,12 +12,15 @@
         <script>
             var oldUrl = "{{ old }}";
             var newUrl = "{{ BASE_URL }}{{ auto_code }}"
-            if (localStorage.getItem("urls") == null) {
-                localStorage.setItem("urls", `${newUrl},${oldUrl}`);
+
+            if (localStorage.getItem("urls-count") == null) {
+                localStorage.setItem("urls-count", 1);
             } else {
-                localStorage.setItem("urls", localStorage.getItem("urls") + `${newUrl},${oldUrl},`);
+                localStorage.setItem(`urls-count`, parseInt(localStorage.getItem("urls-count")) + 1)
             }
-            console.log(localStorage.getItem("urls"))
+
+            localStorage.setItem(`url-${localStorage.getItem("urls-count")}-old`, oldUrl);
+            localStorage.setItem(`url-${localStorage.getItem("urls-count")}-new`, newUrl);
         </script>
     {% endif %}
 

@@ -21,22 +21,21 @@
         <h2>URLs Created</h2>
         <ul id="urls"></ul>
         <script>
-            var urls = localStorage.getItem("urls");
-            if (urls != null) {
-                urls = urls.split(",")
-                for (let i = 0; i < urls.length - 1; i++) {
-                    var oldUrl = urls[i].split("-")[0];
-                    var newUrl = urls[i].split("-")[1];
+            var urlsCount = localStorage.getItem("urls-count");
+            if (urlsCount != 0) {
+                for (let i = 0; i < urlsCount; i++) {
+                    var oldUrl = localStorage.getItem(`url-${i+1}-old`);
+                    var newUrl = localStorage.getItem(`url-${i+1}-new`);
 
                     var a = document.createElement('a');
-                    var linkText = document.createTextNode(oldUrl);
+                    var linkText = document.createTextNode(newUrl);
                     a.appendChild(linkText);
-                    a.title = oldUrl;
-                    a.href = oldUrl;
+                    a.title = newUrl;
+                    a.href = newUrl;
                     document.getElementById("urls").appendChild(a);
 
                     var node = document.createElement("LI");
-                    var textnode = document.createTextNode(`${newUrl}`);
+                    var textnode = document.createTextNode(`${oldUrl}`);
                     node.appendChild(textnode);
                     document.getElementById("urls").appendChild(node);
                 }
