@@ -1,0 +1,7 @@
+{
+    "name": "Bit.ly Clone",
+    "description": "A Bit.ly Clone using Flask",
+    "repository": "https://github.com/boyuan12/Bit.ly-Clone",
+    "logo": "https://node-js-sample.herokuapp.com/node.png",
+    "keywords": ["flask", "python", "bitly", "url-shortener"]
+}
