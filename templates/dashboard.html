@@ -3,7 +3,9 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
         <script src="https://kit.fontawesome.com/0a44d989c2.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="/static/styles.css">
     </head>
@@ -75,9 +77,9 @@
             <h2><span class="d-inline-block text-truncate" style="max-width: 900px;"><span id="original_url">{{ urls[0][1] }}</span></span></h2>
             <small><span><a href="{{ urls[0][1] }}"  id="original_url_a"><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ urls[0][1] }}</span></span></a></small>
             <br><br><br>
-            <small><span id="new_url"><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ BASE_URL }}{{ urls[0][3] }}</span></span></small>
+            <small><span id="new_url"><span class="d-inline-block text-truncate" style="max-width: 600px;">{{ BASE_URL }}{{ urls[0][3] }}</span></span></small>
             <small style="color: white" id="id">{{ urls[0][0] }}</small>
-            <button type="button" id="copy" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="right" data-content="Copied" onclick="copyToClipboard('#new_url')">Copy</button>
+            <button type="button" id="copy" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="right" data-content="Copied" onclick="copyToClipboard('#new_url');" data-delay=1>Copy</button>
             <button type="button" id="edit" class="btn btn-info" onclick="window.location.replace(`/update?id=${document.getElementById('id').textContent}`);">Edit</button>
             <hr>
                 <span><span id="click_count">{{ urls[0][7] }}</span> click(s) <i class="fas fa-mouse-pointer"></i></span>
@@ -86,9 +88,11 @@
         {% endif %}
 
         <script>
-            $(function () {
-                $('[data-toggle="popover"]').popover()
-            })
+            $('[data-toggle="popover"]').popover().click(function () {
+                setTimeout(function () {
+                    $('[data-toggle="popover"]').popover('hide');
+                }, 2000);
+            });
         </script>
     </body>
 </html>
