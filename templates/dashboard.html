@@ -62,9 +62,9 @@
             <div class="col-4">
             {% for url in urls %}
                 <div class="url" onclick="displayInfo('{{ url[1] }}', '{{ BASE_URL }}{{ url[3] }}', '{{ url[5] }}', '{{ url[6] }}', '{{ url[0] }}')">
-                <small>{{ url[4] }}</small>
+                <small><span class="d-inline-block text-truncate" style="max-width: 300px;">{{ url[4] }}</span></small>
                 <p>{{ url[1] }}</p>
-                <a href="{{ BASE_URL }}{{ url[3] }}" style="font-size: 10px;" class="new">{{ BASE_URL }}{{ url[3] }}</a>
+                <a href="{{ BASE_URL }}{{ url[3] }}" style="font-size: 10px;" class="new"><span class="d-inline-block text-truncate" style="max-width: 300px;">{{ BASE_URL }}{{ url[3] }}</span></a>
                 <span class="clicks"><small>{{ url[7] }}</small> click(s) <i class="fas fa-mouse-pointer"></i></span>
                 <hr>
                 </div>
@@ -72,10 +72,10 @@
             </div>
             <div class="col">
             <small>CREATED in <span id="timestamp">{{ urls[0][5] }}</span></small>
-            <h2><span id="original_url">{{ urls[0][1] }}</span></h2>
-            <small><span><a href="{{ urls[0][1] }}"  id="original_url_a">{{ urls[0][1] }}</span></a></small>
+            <h2><span class="d-inline-block text-truncate" style="max-width: 900px;"><span id="original_url">{{ urls[0][1] }}</span></span></h2>
+            <small><span><a href="{{ urls[0][1] }}"  id="original_url_a"><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ urls[0][1] }}</span></span></a></small>
             <br><br><br>
-            <small><span id="new_url">{{ BASE_URL }}{{ urls[0][3] }}</span></small>
+            <small><span id="new_url"><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ BASE_URL }}{{ urls[0][3] }}</span></span></small>
             <small style="color: white" id="id">{{ urls[0][0] }}</small>
             <button type="button" id="copy" class="btn btn-info" data-container="body" data-toggle="popover" data-placement="right" data-content="Copied" onclick="copyToClipboard('#new_url')">Copy</button>
             <button type="button" id="edit" class="btn btn-info" onclick="window.location.replace(`/update?id=${document.getElementById('id').textContent}`);">Edit</button>
